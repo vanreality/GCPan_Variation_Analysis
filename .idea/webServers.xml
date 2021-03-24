@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="WebServers">
+    <option name="servers">
+      <webServer id="ae0ac34f-a2c9-46da-aad4-303fe615e15e" name="HPC" url="http://202.120.58.241">
+        <fileTransfer rootFolder="/lustre/home/acct-clswcc/clswcc-fsy/gastricCancer/panGenome/script" accessType="SFTP" host="202.120.58.241" port="22" sshConfigId="34fd5429-9f5f-4a30-944f-94836101c685" sshConfig="HPC">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" />
+          </advancedOptions>
+        </fileTransfer>
+      </webServer>
+    </option>
+  </component>
+</project>

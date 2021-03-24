@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="SshConfigs">
+    <configs>
+      <sshConfig authType="PASSWORD" host="202.120.58.241" id="34fd5429-9f5f-4a30-944f-94836101c685" port="22" customName="HPC" nameFormat="CUSTOM" username="clswcc-fsy">
+        <option name="customName" value="HPC" />
+      </sshConfig>
+    </configs>
+  </component>
+</project>
