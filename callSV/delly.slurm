@@ -1,21 +1,24 @@
 #!/bin/bash
 
-#SBATCH -J manta
+#SBATCH -J delly
 #SBATCH -p small
-#SBATCH --mail-type=ALL
-#SBATCH --mail-user=mr.van@sjtu.edu.cn
-#SBATCH -o %J.out
-#SBATCH -e %J.err
 #SBATCH -N 1
-#SBATCH --ntasks-per-node=16
+#SBATCH --mail-user=mr.van@sjtu.edu.cn
+#SBATCH --mail-type=ALL
+#SBATCH --output=%J.out
+#SBATCH --error=%J.err
+#SBATCH --ntasks-per-node=4
+
+export OMP_NUM_THREADS=4
+module load bcftools
 
 normal=$1
 tumor=$2
 reference="/lustre/home/acct-clswcc/clswcc-zqd/data/hg38/hg38.fa"
-manta="/lustre/home/acct-clswcc/clswcc-fsy/miniconda3/envs/mypy_py27/bin/configManta.py"
 truncated="/lustre/home/acct-clswcc/clswcc-fsy/gastricCancer/panGenome/script/callSV/truncated_bams"
 origin="/lustre/home/acct-clswcc/clswcc-zqd/project/GATK_bam"
 restore="/lustre/home/acct-clswcc/clswcc-fsy/gastricCancer/panGenome/data/gatkBams"
+delly="/lustre/home/acct-clswcc/clswcc-fsy/software/delly/delly_v0.8.7_linux_x86_64bit"
 
 if [[ $(cat $truncated) =~ $normal ]]; then
 	normal_bam="$restore/$normal/$normal.recal.bam"
@@ -29,16 +32,12 @@ else
 	tumor_bam="$origin/$tumor/$tumor.recal_reads.bam"
 fi
 
-conda activate mypy_py27
-$manta --normalBam $normal_bam --tumorBam $tumor_bam --referenceFasta $reference --runDir result
-$PWD/result/runWorkflow.py -m local -j 16
+$delly call -o $normal.$tumor.bcf -g $reference $tumor_bam $normal_bam
 
-cd $PWD/result/results/variants || exit
-gzip -d *.vcf.gz
-mv diploidSV.vcf germlineSV.vcf
+printf "%s\tcontrol" $normal >> samples.tsv
+printf "%s\ttumor" $tumor >> samples.tsv
 
+$delly filter -p -f somatic -o $normal.$tumor.somatic.bcf -s samples.tsv $normal.$tumor.bcf
 
-
-
-
-
+bcftools view $normal.$tumor.bcf > $normal.$tumor.vcf
+bcftools view $normal.$tumor.somatic.bcf > $normal.$tumor.somatic.vcf

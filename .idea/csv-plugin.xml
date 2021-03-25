@@ -17,6 +17,20 @@
             </Attribute>
           </value>
         </entry>
+        <entry key="/callSV/delly.slurm">
+          <value>
+            <Attribute>
+              <option name="separator" value="&#9;" />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="/callSV/svaba.slurm">
+          <value>
+            <Attribute>
+              <option name="separator" value="&#9;" />
+            </Attribute>
+          </value>
+        </entry>
         <entry key="/plot/plot.R">
           <value>
             <Attribute>
