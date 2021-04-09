@@ -15,7 +15,7 @@ def main(args):
 
     for line in s.readlines():
         line = line.split("\t")
-        if line[0] == "":
+        if line[0] == "Gene":
             continue
         cov = []
         for i in range(1, len(line)):

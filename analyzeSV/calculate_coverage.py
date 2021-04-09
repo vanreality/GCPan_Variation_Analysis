@@ -28,7 +28,7 @@ def main(args):
     l = open(args.l, 'r')
     n = open(args.n, 'r')
     # r = open(args.i + "/../coverage", 'w')
-    r = open(args.i + "/../coverage.unfiltered", 'w')  # unfiltered coverage
+    r = open(args.i + "/../coverage", 'w')  # unfiltered coverage
 
     cds_len = {}
     result = {}
@@ -42,8 +42,8 @@ def main(args):
     for sample in s.readlines():
         # if os.path.exists(args.i + "/" + sample.strip()):
         #     with open(args.i + "/" + sample.strip()) as s:
-        if os.path.exists(args.i + "/" + sample.strip() + ".unfiltered"):
-            with open(args.i + "/" + sample.strip() + ".unfiltered") as s:
+        if os.path.exists(args.i + "/" + sample.strip()):
+            with open(args.i + "/" + sample.strip()) as s:
                 for line in s.readlines():
                     line = line.split("\t")
                     gene = line[7]

@@ -19,6 +19,7 @@ truncated="/lustre/home/acct-clswcc/clswcc-fsy/gastricCancer/panGenome/script/ca
 origin="/lustre/home/acct-clswcc/clswcc-zqd/project/GATK_bam"
 restore="/lustre/home/acct-clswcc/clswcc-fsy/gastricCancer/panGenome/data/gatkBams"
 delly="/lustre/home/acct-clswcc/clswcc-fsy/software/delly/delly_v0.8.7_linux_x86_64bit"
+excl="/lustre/home/acct-clswcc/clswcc-fsy/software/delly/delly/excludeTemplates/human.hg38.excl.tsv"
 
 if [[ $(cat $truncated) =~ $normal ]]; then
 	normal_bam="$restore/$normal/$normal.recal.bam"
@@ -32,9 +33,9 @@ else
 	tumor_bam="$origin/$tumor/$tumor.recal_reads.bam"
 fi
 
-$delly call -o $normal.$tumor.bcf -g $reference $tumor_bam $normal_bam
+$delly call -x $excl -o $normal.$tumor.bcf -g $reference $tumor_bam $normal_bam
 
-printf "%s\tcontrol" $normal >> samples.tsv
+printf "%s\tcontrol\n" $normal >> samples.tsv
 printf "%s\ttumor" $tumor >> samples.tsv
 
 $delly filter -p -f somatic -o $normal.$tumor.somatic.bcf -s samples.tsv $normal.$tumor.bcf

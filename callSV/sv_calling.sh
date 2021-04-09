@@ -11,25 +11,25 @@ root="/lustre/home/acct-clswcc/clswcc-fsy/gastricCancer/panGenome"
 script=$root/script/callSV
 result=$root/result/$caller
 
-#samples=$(cat 185samples)
-samples="WGC012904D.WGC013444D"
-mkdir $result
-cd $result || exit
-for sample in $samples;
-do
-if [ -d $sample ]; then
-continue
+samples=$(cat 185samples)
+if [ ! -d $result ]; then
+  mkdir $result
 fi
-mkdir $sample;
-cd $sample || exit
+cd $result || exit
+for sample in $samples; do
+  if [ -d $sample ]; then
+    continue
+  fi
+  mkdir $sample;
+  cd $sample || exit
 
-#batch process
+  #batch process
 
-normal=$(echo $sample | awk -F "." '{print $1}')
-tumor=$(echo $sample | awk -F "." '{print $2}')
+  normal=$(echo $sample | awk -F "." '{print $1}')
+  tumor=$(echo $sample | awk -F "." '{print $2}')
 
-cp $script/$caller.slurm ./
-sbatch $caller.slurm $normal $tumor
+  cp $script/$caller.slurm ./
+  sbatch $caller.slurm $normal $tumor
 
-cd ..;
+  cd ..;
 done;
