@@ -10,6 +10,13 @@
             </Attribute>
           </value>
         </entry>
+        <entry key="/analyzeSV/blastn.slurm">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
         <entry key="/analyzeSV/calculate_coverage.py">
           <value>
             <Attribute>

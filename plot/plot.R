@@ -51,17 +51,42 @@ plot_SV_PAV_compare <- function(x) {
 compare.result <- read.csv(paste0(root, "/result/compareSVPAV/manta.germline.sv/coverage.0.8.gene.csv"))
 plot_SV_PAV_compare(compare.result)
 
+compare.result <- read.csv(paste0(root, "/result/compareSVPAV/manta.germline.sv/coverage.unfiltered.0.8.gene.csv"), header = TRUE)
+plot_SV_PAV_compare(compare.result)
+
 #<----------- manta somatic SV ----------->
 compare.result <- read.csv(paste0(root, "/result/compareSVPAV/manta.somatic.sv/coverage.0.8.gene.csv"))
+plot_SV_PAV_compare(compare.result)
+
+compare.result <- read.csv(paste0(root, "/result/compareSVPAV/manta.somatic.sv/coverage.unfiltered.0.8.gene.csv"))
 plot_SV_PAV_compare(compare.result)
 
 #<----------- svaba germline SV ----------->
 compare.result <- read.csv(paste0(root, "/result/compareSVPAV/svaba.germline.sv/coverage.0.8.gene.csv"))
 plot_SV_PAV_compare(compare.result)
 
+compare.result <- read.csv(paste0(root, "/result/compareSVPAV/svaba.germline.sv/coverage.unfiltered.0.8.gene.csv"))
+plot_SV_PAV_compare(compare.result)
+
 #<----------- svaba somatic SV ----------->
 compare.result <- read.csv(paste0(root, "/result/compareSVPAV/svaba.somatic.sv/coverage.0.8.gene.csv"))
 plot_SV_PAV_compare(compare.result)
+
+compare.result <- read.csv(paste0(root, "/result/compareSVPAV/svaba.somatic.sv/coverage.unfiltered.0.8.gene.csv"))
+plot_SV_PAV_compare(compare.result)
+
+#<----------- survivor germline SV ----------->
+compare.result <- read.csv(paste0(root, "/result/compareSVPAV/survivor.germline.sv/coverage.0.8.gene.csv"))
+plot_SV_PAV_compare(compare.result)
+
+plot_SV_PAV_compare(compare.result[apply(compare.result, 1, function(x) {sum(x==3)})>50,])
+
+#<----------- survivor somatic SV ----------->
+compare.result <- read.csv(paste0(root, "/result/compareSVPAV/survivor.somatic.sv/coverage.0.8.gene.csv"))
+plot_SV_PAV_compare(compare.result)
+
+plot_SV_PAV_compare(compare.result[apply(compare.result, 1, function(x) {sum(x==3)})>50,])
+
 
 #<-------------------------------------------------------- SV density and distribution plot ------------------------------------------------------------>
 

@@ -4,8 +4,8 @@
 #SBATCH -p small
 #SBATCH --mail-user=mr.van@sjtu.edu.cn
 #SBATCH --mail-type=ALL
-#SBATCH --output=%J.out
-#SBATCH --error=%J.err
+#SBATCH --output=compare.out
+#SBATCH --error=compare.err
 #SBATCH --ntasks-per-node=1
 
 module load bedtools2
@@ -33,7 +33,7 @@ for type in ${variation_type[*]} ; do
   do
     vcf=$vcf_dir/$sample/$sample.${type}.merged.vcf
 
-    singularity run /lustre/share/img/ood-app/rstudio_3.6.3.sif Rscript $script_dir/survivor_extract_gene_sv.R $vcf
+    singularity run /lustre/share/img/ood-app/rstudio_3.6.3.sif Rscript $script_dir/survivor_extract_gene_sv.R $vcf $type
     bedtools intersect -a ${vcf}.bed -b $cds -wa -wb > ${res_dir}/intersect/${sample}
 
     if [[ $type == "somatic" ]]; then
