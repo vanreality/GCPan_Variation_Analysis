@@ -27,8 +27,8 @@ def main(args):
     s = open(args.s, 'r')
     l = open(args.l, 'r')
     n = open(args.n, 'r')
-    # r = open(args.i + "/../coverage", 'w')
-    r = open(args.i + "/../coverage", 'w')  # unfiltered coverage
+    r = open(args.i + "/../coverage", 'w')
+    # r = open(args.i + "/../coverage.unfiltered", 'w')  # unfiltered coverage
 
     cds_len = {}
     result = {}

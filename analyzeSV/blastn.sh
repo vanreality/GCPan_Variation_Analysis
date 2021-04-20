@@ -21,12 +21,12 @@ for sample in $samples; do
   if [ -f $vcf_dir/germlineSV.vcf.fasta ]; then
     cd $result_dir/$sample || exit
     cp $root/script/analyzeSV/blastn.slurm ./
-    sbatch blastn.slurm $vcf_dir/germlineSV.vcf.fasta ./germlineSV.blastn.out
+    sbatch blastn.slurm $vcf_dir/germlineSV.vcf.fasta ./germlineSV.novelSeq.blastn.out
   fi
 
   if [ -f $vcf_dir/somaticSV.vcf.fasta ]; then
     cd $result_dir/$sample || exit
     cp $root/script/analyzeSV/blastn.slurm ./
-    sbatch blastn.slurm $vcf_dir/somaticSV.vcf.fasta ./somaticSV.blastn.out
+    sbatch blastn.slurm $vcf_dir/somaticSV.vcf.fasta ./somaticSV.novelSeq.blastn.out
   fi
 done;
