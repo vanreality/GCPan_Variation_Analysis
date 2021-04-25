@@ -20,7 +20,7 @@ result=$root/result/compareSVPAV
 calculate=$script_dir/calculate_coverage.py
 compare=$script_dir/compare_with_PAV.py
 
-#sv_calling_method=("manta" "svaba")
+#sv_calling_method=("manta" "svaba" "delly" "survivor")
 variation_type=("germline" "somatic")
 
 for type in ${variation_type[*]} ; do

@@ -15,7 +15,7 @@ def cal_cov_len(data):
             if higher[0] > lower[1]:
                 union.append(higher)
             else:
-                union[-1] = (lower[0], higher[1])
+                union[-1] = (lower[0], max(lower[1], higher[1]))
 
     for interval in union:
         cov_len += interval[1] - interval[0] + 1
@@ -28,7 +28,6 @@ def main(args):
     l = open(args.l, 'r')
     n = open(args.n, 'r')
     r = open(args.i + "/../coverage", 'w')
-    # r = open(args.i + "/../coverage.unfiltered", 'w')  # unfiltered coverage
 
     cds_len = {}
     result = {}
@@ -40,8 +39,6 @@ def main(args):
         cds_len[line[0]] = line[2].strip()
 
     for sample in s.readlines():
-        # if os.path.exists(args.i + "/" + sample.strip()):
-        #     with open(args.i + "/" + sample.strip()) as s:
         if os.path.exists(args.i + "/" + sample.strip()):
             with open(args.i + "/" + sample.strip()) as s:
                 for line in s.readlines():

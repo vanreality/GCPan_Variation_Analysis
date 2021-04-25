@@ -8,4 +8,4 @@
 #SBATCH --error=%J.err
 #SBATCH --ntasks-per-node=2
 
-python3 filter_blastn.py -i $1
+python3 filter_blastn.py -i $1 -f $2
