@@ -28,7 +28,8 @@ if (control == "germline") {
 } else {
   survivor <- survivor[which(gsub(":.*", "", survivor[,ncol(survivor) - 1]) == "1/1"),]
 }
-gap <- survivor %>% filter(SVTYPE == "DEL" | SVTYPE == "INV") %>% .[,c(1:5, 8)]
+# gap <- survivor %>% filter(SVTYPE == "DEL" | SVTYPE == "INV") %>% .[,c(1:5, 8)]
+gap <- survivor %>% filter(SVTYPE == "DEL") %>% .[,c(1:5, 8)]
 gap$END <- gsub("(.*;END=)|(;CIPOS=.*)", "", gap$INFO)
 gap <- gap[,c("CHROM", "POS", "END", "ID")]
 

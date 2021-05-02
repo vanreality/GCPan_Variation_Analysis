@@ -39,10 +39,10 @@ def main(args):
     novel_sequence_covered = {}
     for sample in samples:
         cols.append(sample.strip())
-    summary = pd.DataFrame(index=["mapped_novel", "mapped_ref", "no_mapped", "total_ins"], columns=cols)
+    summary = pd.DataFrame(index=["mapped_novel", "mapped_ref", "mapped_none", "total_ins"], columns=cols)
     for sample in samples:
         sample = sample.strip()
-        mapped_novel, mapped_ref, no_mapped, total_ins = [0] * 4
+        mapped_novel, mapped_ref, mapped_none, total_ins = [0] * 4
         for var_type in ["germline", "somatic"]:
             path = root + "/" + sample + "/" + var_type + "SV.blastn.out.filtered"
             if os.path.exists(path):
@@ -58,8 +58,8 @@ def main(args):
                         lower_bound = min(int(line[-5]), int(line[-4]))
                         higher_bound = max(int(line[-5]), int(line[-4]))
                         novel_sequence_covered[line[1]].append([lower_bound, higher_bound])
-        no_mapped = total_ins - mapped_ref - mapped_novel
-        summary[sample] = [mapped_novel, mapped_ref, no_mapped, total_ins]
+        mapped_none = total_ins - mapped_ref - mapped_novel
+        summary[sample] = [mapped_novel, mapped_ref, mapped_none, total_ins]
 
     covered_length = 0
     for seq in novel_sequence_covered:
@@ -67,11 +67,9 @@ def main(args):
         covered_length += count_covered_length(novel_sequence_covered[seq])
 
     # output summary
-    summary.to_csv(args.o)
-    with open(args.o, 'r+') as o:
-        content = o.read()
-        o.seek(0, 0)
-        o.write("# Total length covered by SV INS : " + str(covered_length) + "\n" + content)
+    with open(args.o, 'w') as o:
+        o.write("# Total length covered by SV INS : " + str(covered_length) + "\n")
+        summary.to_csv(o, mode='a')
 
 
 if __name__ == "__main__":

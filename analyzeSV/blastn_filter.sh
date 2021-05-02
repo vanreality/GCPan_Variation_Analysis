@@ -15,12 +15,12 @@ for sample in $samples ; do
     cp $script_dir/filter_blastn.py ./
     if [ -f germlineSV.blastn.out ]; then
       if [ ! -f germlineSV.blastn.out.filtered ]; then
-        sbatch filter_blastn.slurm germlineSV.blastn.out $manta_dir/$sample/result/results/variants/germlineSV.vcf.fasta
+        sbatch blastn_filter.slurm germlineSV.blastn.out $manta_dir/$sample/result/results/variants/germlineSV.vcf.fasta
       fi
     fi
     if [ -f somaticSV.blastn.out ]; then
       if [ ! -f somaticSV.blastn.out.filtered ]; then
-        sbatch filter_blastn.slurm somaticSV.blastn.out $manta_dir/$sample/result/results/variants/somaticSV.vcf.fasta
+        sbatch blastn_filter.slurm somaticSV.blastn.out $manta_dir/$sample/result/results/variants/somaticSV.vcf.fasta
       fi
     fi
 done

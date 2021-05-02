@@ -54,22 +54,39 @@ p + geom_bar(aes(y=Count,fill=factor(Type)),position="fill",stat = "identity", w
   scale_y_continuous(labels = percent, expand = expansion(mult=0)) + 
   ylab("Percentage")
 
+# <---------------------------------------------------------------- filtered insertion length density ---------------------------------------------------------------->
+samples <- unlist(read.table(paste0(root, "/script/analyzeSV/185samples"), header = FALSE))
 
-
-
-
-
-
-# Read in blastn result file
-blastn.out <- paste0(root, "/result/blastn/WGC012904D.WGC013444D/germlineSV.blastn.out.filtered")
-blastn.out <- read.table(blastn.out, header = FALSE, stringsAsFactors = FALSE)
-colnames(blastn.out) <- c("QSEQID", "SSEQID", "PIDENT", "LENGTH", "MISMATCH", 
-                          "GAPOPEN", "QSTART", "QEND", "SSTART", "SEND", "EVALUE", "BITSCORE", "QLEN")
-
-# filter max bitscore
-max.score <- blastn.out %>% group_by(QSEQID) %>% summarise(MAX = max(BITSCORE))
-blastn.out <- do.call(rbind, lapply(1:nrow(max.score), function(x) {
-  subset(blastn.out, (QSEQID == unlist(max.score[x, "QSEQID"])) & (BITSCORE == unlist(max.score[x, "MAX"])))
+res <- do.call(cbind, lapply(samples, function(x) {
+  blastn <- read.table(paste0(root, "/result/blastn/", x, "/germlineSV.blastn.out.filtered"))
+  colnames(blastn) <- c("QSEQID", "SSEQID", "PIDENT", "LENGTH", "MISMATCH", 
+                        "GAPOPEN", "QSTART", "QEND", "SSTART", "SEND", "EVALUE", "BITSCORE", "QLEN")
+  blastn <- blastn %>% filter(grepl("GC",SSEQID))
+  len <- data.frame(blastn$QLEN)
+  colnames(len) <- x
+  rep <- data.frame(rep(NA,292-nrow(len)))
+  colnames(rep) <- x
+  return(rbind(len, rep))
 }))
-blastn.out <- blastn.out %>% filter(grepl("GC", SSEQID))
+
+pd <- melt(res, variable.name = "samples", value.name = "ins_length", na.rm = TRUE)
+
+ggplot(pd, aes(x=samples, y=ins_length)) + 
+  geom_boxplot(outlier.size = .1) + 
+  xlab("185 samples") + 
+  theme(axis.text.x = element_blank()) + 
+  theme(axis.ticks.x = element_blank())
+
+ggplot(pd, aes(x=ins_length, color=samples, group=samples)) +
+  geom_density(alpha = .1) + 
+  theme(legend.position = "none")
+
+
+
+
+
+
+
+
+
 
