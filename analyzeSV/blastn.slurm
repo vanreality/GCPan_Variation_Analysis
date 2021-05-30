@@ -16,7 +16,7 @@ blastn="/lustre/home/acct-clswcc/clswcc-fsy/software/ncbi-blast-2.10.1+/bin/blas
 $blastn -db $db \
   -query $fasta \
   -out $result \
-  -outfmt 6 \
+  -outfmt "6 qseqid sseqid pident length mismatch gapopen qstart qend sstart send evalue bitscore qlen" \
   -num_threads 4 \
-  -evalue 1e-5 \
-  -max_target_seqs 100
+  -max_target_seqs 5 \
+  -evalue 1e-5

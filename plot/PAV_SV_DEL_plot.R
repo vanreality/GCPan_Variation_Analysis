@@ -18,6 +18,7 @@ phenotype$NameT <- namesT %>% filter(V1 == phenotype$Tumor) %>% .$V2
 cds <- read.table(paste0(root, "/data/PAV/cds.ann.bed"))
 cds <- cds %>% filter(V1 == "chrY") %>% .[, c(1, 4, 5)]
 cds <- unique(cds)
+gene.bed <- read.table(paste0(root, "/data/PAV/gene.bed"), header = FALSE, sep = "\t", stringsAsFactors = FALSE)
 
 ### SV PAV compare result
 # 0 : SV    / Absence
@@ -27,66 +28,106 @@ cds <- unique(cds)
 
 #<---------------------------------------------- SV PAV compare result plot ----------------------------------------------------------------->
 
-plot_SV_PAV_compare <- function(x) {
+phenotype_asso_genes <- c("ANKRD9",  "BHLHA9", "BPY2", "BPY2B", "BPY2C", "CDY1", "CDY1B", 
+                          "EIF1AY","GPR42", "GRIN2D",  "HCN2",  "HIST1H4B",  "HLA-DRB1", 
+                          "HLA-DRB5", "MAFA",  "MAP9",  "OR4C11",  "OR4P4",  "OR4S2", "PIM3",
+                          "PSG4", "PSG9",  "SRY",  "TAF4",  "TAS2R43", "TCF15",
+                          "TRIM48",  "TRIM64",  "UGT2B28")
+
+SV_PAV_compare_stat <- function(x,y,z){
         compare.result <- x %>% filter(!grepl("GC", Gene))
         compare.result <- compare.result[-which(compare.result$Gene %in% cds$V4),]
-        data <- as.matrix(compare.result[,-1])[,phenotype$NameN]
-        rownames(data) <- as.matrix(compare.result[,1])
-        Heatmap(data, 
-                col = structure(c("red", "white", "black", "blue"), names = c("0", "1", "2", "3")),
-                name = "Compare result", 
-                show_row_names = FALSE,
-                show_column_names = FALSE,
-                column_title = paste0(length(data[1,]), " samples"),
-                row_title = paste0(length(data[,1]), " genes"),
-                heatmap_legend_param = list(at = c(0, 1, 2, 3), labels = c("SV/Absence", "noSV/Presence", "SV/Presence", "noSV/Absence")),
-                top_annotation = HeatmapAnnotation(gender = as.character(phenotype$Gender), 
-                                                   age = phenotype$Age, 
-                                                   diameter = phenotype$Diameter,
-                                                   Lauren = as.character(phenotype$Lauren),
-                                                   Borrman = as.character(phenotype$Borrman)))
+        info <- gene.bed[which(gene.bed$V4 %in% compare.result$Gene), c(1, 6)]
+        data <- as.matrix(compare.result[,-1])[, z]
+        rownames(data) <- as.matrix(info[,2])
+        return(data)
 }
 
-#<----------- manta germline SV ----------->
-compare.result <- read.csv(paste0(root, "/result/compareSVPAV/manta.germline.sv/coverage.0.8.gene.csv"))
-plot_SV_PAV_compare(compare.result)
+plot_SV_PAV_compare <- function(x, y, z) {
+        data <- SV_PAV_compare_stat(x, z)
+        mark_logi <- rownames(data) %in% phenotype_asso_genes
+        ht <- Heatmap(data, 
+                col = structure(c("#D6CD56", "#BB4F50", "#74BBE8", "#3C71A0"), names = c("0", "1", "2", "3")),
+                left_annotation = rowAnnotation(a = anno_simple(as.character(rownames(data) %in% inter.genes), 
+                                                                width = unit(2, 'mm'),
+                                                                col = structure(c("white", "#E68C4C"), names = c("FALSE", "TRUE") )),
+                                                show_annotation_name = F),
+                right_annotation = rowAnnotation(c = anno_mark(at = (1:nrow(data))[mark_logi],
+                                                               labels = rownames(data)[mark_logi],
+                                                               link_width = unit(10, "mm"))),
+                name = "Comparison", 
+                show_row_names = FALSE,
+                show_column_names = FALSE,
+                column_dend_side = "bottom",
+                column_title_side = "bottom",
+                column_title = paste0(y, " (n=",length(data[1,]), ")"),
+                row_title = paste0(length(data[,1]), " genes"),
+                heatmap_legend_param = list(at = c(0, 1, 2, 3), labels = c("SV(-)/PAV(-)", "SV(+)/PAV(+)", "SV(-)/PAV(+)", "SV(+)/PAV(-)")))
+        draw(ht, heatmap_legend_side = "right", 
+             merge_legends = T,
+             annotation_legend_list = Legend(labels= c("Shared genes", ""),
+                                                  legend_gp = grid::gpar(fill = structure(c( "#E68C4C", "white"), names = c("TRUE", "FALSE") ))))
+}
 
-compare.result <- read.csv(paste0(root, "/result/compareSVPAV/manta.germline.sv/coverage.unfiltered.0.8.gene.csv"))
-plot_SV_PAV_compare(compare.result)
+#<----------- data process --------------------->
+compare.res.normal <- read.csv(paste0(root, "/result/compareSVPAV/survivor.germline.sv/coverage.0.8.gene.csv"), stringsAsFactors = FALSE)
+compare.res.normal.stat <- SV_PAV_compare_stat(compare.res.normal, phenotype$NameN)
 
-#<----------- manta somatic SV ----------->
-compare.result <- read.csv(paste0(root, "/result/compareSVPAV/manta.somatic.sv/coverage.0.8.gene.csv"))
-plot_SV_PAV_compare(compare.result)
+compare.res.tumor <- read.csv(paste0(root, "/result/compareSVPAV/survivor.somatic.sv/coverage.0.8.gene.csv"), stringsAsFactors = FALSE)
+compare.res.tumor.stat <- SV_PAV_compare_stat(compare.res.tumor, phenotype$NameT)
 
-compare.result <- read.csv(paste0(root, "/result/compareSVPAV/manta.somatic.sv/coverage.unfiltered.0.8.gene.csv"))
-plot_SV_PAV_compare(compare.result)
-
-#<----------- svaba germline SV ----------->
-compare.result <- read.csv(paste0(root, "/result/compareSVPAV/svaba.germline.sv/coverage.0.8.gene.csv"))
-plot_SV_PAV_compare(compare.result)
-
-compare.result <- read.csv(paste0(root, "/result/compareSVPAV/svaba.germline.sv/coverage.unfiltered.0.8.gene.csv"))
-plot_SV_PAV_compare(compare.result)
-
-#<----------- svaba somatic SV ----------->
-compare.result <- read.csv(paste0(root, "/result/compareSVPAV/svaba.somatic.sv/coverage.0.8.gene.csv"))
-plot_SV_PAV_compare(compare.result)
-
-compare.result <- read.csv(paste0(root, "/result/compareSVPAV/svaba.somatic.sv/coverage.unfiltered.0.8.gene.csv"))
-plot_SV_PAV_compare(compare.result)
+inter.genes <- intersect(rownames(compare.res.normal.stat), rownames(compare.res.tumor.stat))
 
 #<----------- survivor germline SV ----------->
-compare.result <- read.csv(paste0(root, "/result/compareSVPAV/survivor.germline.sv/coverage.0.8.gene.csv"))
-plot_SV_PAV_compare(compare.result)
+title <- "Normal samples"
 
-plot_SV_PAV_compare(compare.result[apply(compare.result, 1, function(x) {sum(x==3)})>50,])
+pdf("DEL_N.pdf", width = 11.5, height = 9)
+plot_SV_PAV_compare(compare.res.normal, title, phenotype$NameN)
+dev.off()
+
+# pdf("DEL_N.pdf", width = 11, height =8.5)
+# plot_SV_PAV_compare(compare.result[apply(compare.result, 1, function(x) {sum(x==3)})>54,], title, phenotype$NameN)
+# dev.off()
 
 #<----------- survivor somatic SV ----------->
-compare.result <- read.csv(paste0(root, "/result/compareSVPAV/survivor.somatic.sv/coverage.0.8.gene.csv"))
-plot_SV_PAV_compare(compare.result)
+title <- "Tumor samples"
 
-plot_SV_PAV_compare(compare.result[apply(compare.result, 1, function(x) {sum(x==3)})>50,])
+pdf("DEL_T.pdf", width = 11.5, height = 9)
+plot_SV_PAV_compare(compare.res.tumor, title, phenotype$NameT)
+dev.off()
 
+# pdf("DEL_T.pdf", width = 11, height =8.5)
+# plot_SV_PAV_compare(compare.result[apply(compare.result, 1, function(x) {sum(x==3)})>54,], title, phenotype$NameT)
+# dev.off()
+
+# 
+# #<----------- manta germline SV ----------->
+# compare.result <- read.csv(paste0(root, "/result/compareSVPAV/manta.germline.sv/coverage.0.8.gene.csv"))
+# plot_SV_PAV_compare(compare.result)
+# 
+# compare.result <- read.csv(paste0(root, "/result/compareSVPAV/manta.germline.sv/coverage.unfiltered.0.8.gene.csv"))
+# plot_SV_PAV_compare(compare.result)
+# 
+# #<----------- manta somatic SV ----------->
+# compare.result <- read.csv(paste0(root, "/result/compareSVPAV/manta.somatic.sv/coverage.0.8.gene.csv"))
+# plot_SV_PAV_compare(compare.result)
+# 
+# compare.result <- read.csv(paste0(root, "/result/compareSVPAV/manta.somatic.sv/coverage.unfiltered.0.8.gene.csv"))
+# plot_SV_PAV_compare(compare.result)
+# 
+# #<----------- svaba germline SV ----------->
+# compare.result <- read.csv(paste0(root, "/result/compareSVPAV/svaba.germline.sv/coverage.0.8.gene.csv"))
+# plot_SV_PAV_compare(compare.result)
+# 
+# compare.result <- read.csv(paste0(root, "/result/compareSVPAV/svaba.germline.sv/coverage.unfiltered.0.8.gene.csv"))
+# plot_SV_PAV_compare(compare.result)
+# 
+# #<----------- svaba somatic SV ----------->
+# compare.result <- read.csv(paste0(root, "/result/compareSVPAV/svaba.somatic.sv/coverage.0.8.gene.csv"))
+# plot_SV_PAV_compare(compare.result)
+# 
+# compare.result <- read.csv(paste0(root, "/result/compareSVPAV/svaba.somatic.sv/coverage.unfiltered.0.8.gene.csv"))
+# plot_SV_PAV_compare(compare.result)
 
 #<-------------------------------------------------------- SV density and distribution plot ------------------------------------------------------------>
 
