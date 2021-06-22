@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#SBATCH -J snp_germline_categorical
+#SBATCH -J indel_germline_categorical
 #SBATCH -p small
 #SBATCH --mail-user=mr.van@sjtu.edu.cn
 #SBATCH --mail-type=ALL
@@ -9,9 +9,9 @@
 #SBATCH --error=%J.err
 
 root="/lustre/home/acct-clswcc/clswcc-fsy/gastricCancer/panGenome"
-spt_dir=$root/script/analyzeSNP
-vcf_dir=$root/data/snp
-res_dir=$root/result/snpGWAS/categorical
+spt_dir=$root/script/analyzeIndel
+vcf_dir=$root/data/indel
+res_dir=$root/result/indelGWAS/categorical
 
 cd $res_dir || exit
 

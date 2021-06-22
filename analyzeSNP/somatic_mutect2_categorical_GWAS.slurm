@@ -16,7 +16,7 @@ res_dir=$root/result/snpGWAS/categorical
 cd $res_dir || exit
 
 # Convert vcf file to plink bed/bim/fam files
-plink --vcf $vcf_dir/somatic_mutect2_snp.vcf --allow-extra-chr --out somatic_mutect2 --double-id
+plink --vcf $vcf_dir/somatic_mutect2.vcf --allow-extra-chr --out somatic_mutect2 --double-id
 
 # Add gender information
 python3 $spt_dir/add_phenotype.py \
@@ -39,7 +39,7 @@ rm somatic_tmp_*.b*
 rm somatic_tmp_*.f*
 
 # Run GWAS for different phenotypes
-phenotypes=("Location" "Borrman" "Grade" "Lauren" "EBV" "HP")
+phenotypes=("Subtype" "Location" "Borrman" "Grade" "Lauren")
 for p in "${phenotypes[@]}" ; do
   # make phenotype directory
   mkdir $res_dir/$p

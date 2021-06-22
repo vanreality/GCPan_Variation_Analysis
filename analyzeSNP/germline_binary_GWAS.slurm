@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#SBATCH -J germline_binary
+#SBATCH -J snp_germline_binary
 #SBATCH -p small
 #SBATCH --mail-user=mr.van@sjtu.edu.cn
 #SBATCH --mail-type=ALL
@@ -18,7 +18,7 @@ cd $res_dir || exit
 control=("hb" "hs")
 for c in ${control[*]} ; do
   # Convert vcf file to plink bed/bim/fam files
-  plink --vcf $vcf_dir/germline_${c}_snp.vcf --out germline_${c}_binary --double-id
+  plink --vcf $vcf_dir/germline_${c}.vcf --out germline_${c}_binary --double-id
 
   # Add phenotype info
   python3 $spt_dir/add_phenotype.py \
@@ -52,4 +52,24 @@ for c in ${control[*]} ; do
   rm germline_${c}_tmp_*.b*
   rm germline_${c}_tmp_*.f*
   rm germline_${c}_tmp_*.h*
+done
+
+phenotype=("EBV" "HP")
+for p in ${phenotype[*]} ; do
+  mkdir $res_dir/$p
+  cd $res_dir/$p || exit
+
+  plink --vcf $vcf_dir/germline.vcf --out germline_$p --double-id
+  python3 $spt_dir/add_phenotype.py \
+    -p $vcf_dir/phenotype.txt \
+    -f $res_dir/$p/germline_$p.fam \
+    -o $res_dir/$p/germline_$p.fam \
+    -t $p
+  sed -i "s/0$/1/g" germline_$p.fam
+  sed -i "s/1$/2/g" germline_$p.fam
+  plink --bfile germline_$p --geno 0.02 --mind 0.02 --maf 0.01 --hwe 1e-6 --make-bed --out germline_${p}_qc
+
+  plink --bfile germline_${p}_qc -assoc --adjust --out germline_${p}_assoc
+  plink --bfile germline_${p}_qc --logistic --out germline_${p}_logistic
+  awk '!/NA/' germline_${p}_logistic.assoc.logistic > germline_${p}_logistic_no_default.assoc.logistic
 done
