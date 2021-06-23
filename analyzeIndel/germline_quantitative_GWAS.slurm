@@ -21,8 +21,8 @@ cp ../categorical/germline_qc.* ./
 # Add phenotype information
 python3 $spt_dir/add_phenotype.py \
   -p $vcf_dir/phenotype.txt \
-  -f $res_dir/germline.fam \
-  -o $res_dir/germline.fam \
+  -f $res_dir/germline_qc.fam \
+  -o $res_dir/germline_qc.fam \
   -t "Diameter"
 
 # Plink assoc
