@@ -40,11 +40,12 @@ rm germline_tmp_*.f*
 rm germline_tmp_*.h*
 
 # Run GWAS for different phenotypes
-phenotypes=("Subtype" "Location" "Borrman" "Grade" "Lauren")
-for p in "${phenotypes[@]}" ; do
+phenotypes=("Subtype" "Location" "Grade" "Lauren")
+for p in ${phenotypes[*]} ; do
   # make phenotype directory
   mkdir $res_dir/$p
   cp $res_dir/germline_qc.b* $res_dir/$p/
+  cd $res_dir/$p || exit
 
   # Add phenotype info to fam file
   python3 $spt_dir/add_phenotype.py \
@@ -55,6 +56,19 @@ for p in "${phenotypes[@]}" ; do
     -t $p
 
   # GWAS for categorical phenotypes
+  categories=$(awk '{print $6}' germline_qc.fam | sort | uniq)
+  for c in ${categories[*]}; do
+    mkdir $res_dir/$p/$c
+    cd $res_dir/$p/$c || exit
+    cp $res_dir/$p/germline_qc* ./
+    bash $spt_dir/case_control.sh germline_qc.fam $c
 
+    # Treat every subtype as binary trait
+    # Plink assoc
+    plink --bfile germline_qc -assoc --adjust --out germline_assoc
+    # Plink logistic
+    plink --bfile germline_qc --logistic --out germline_logistic
+    awk '!/NA/' germline_logistic.assoc.logistic > germline_logistic_no_na.assoc.logistic
+  done
 done
 

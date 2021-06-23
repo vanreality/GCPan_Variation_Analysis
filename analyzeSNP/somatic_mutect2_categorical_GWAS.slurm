@@ -40,7 +40,7 @@ rm somatic_tmp_*.f*
 
 # Run GWAS for different phenotypes
 phenotypes=("Subtype" "Location" "Borrman" "Grade" "Lauren")
-for p in "${phenotypes[@]}" ; do
+for p in ${phenotypes[*]} ; do
   # make phenotype directory
   mkdir $res_dir/$p
   cp $res_dir/somatic_mutect2_qc.b* $res_dir/$p/
