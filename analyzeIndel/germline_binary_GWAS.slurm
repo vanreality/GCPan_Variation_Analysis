@@ -9,7 +9,7 @@
 #SBATCH --error=%J.err
 
 root="/lustre/home/acct-clswcc/clswcc-fsy/gastricCancer/panGenome"
-spt_dir=$root/script/analyzeIndel
+spt_dir=$root/script/analyzeSNP
 vcf_dir=$root/data/indel
 res_dir=$root/result/indelGWAS/binary
 

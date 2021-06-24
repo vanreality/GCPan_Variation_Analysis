@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#SBATCH -J indel_germline_categorical
+#SBATCH -J sv_germline_categorical
 #SBATCH -p small
 #SBATCH --mail-user=mr.van@sjtu.edu.cn
 #SBATCH --mail-type=ALL
@@ -10,13 +10,13 @@
 
 root="/lustre/home/acct-clswcc/clswcc-fsy/gastricCancer/panGenome"
 spt_dir=$root/script/analyzeSNP
-vcf_dir=$root/data/indel
-res_dir=$root/result/indelGWAS/categorical
+vcf_dir=$root/result/survivor/survivor_germline
+res_dir=$root/result/svGWAS/categorical
 
 cd $res_dir || exit
 
 # Convert vcf file to plink bed/bim/fam files
-plink --vcf $vcf_dir/germline.vcf --out germline --double-id
+plink --vcf $vcf_dir/merged.vcf --out germline --double-id
 
 # Add gender information
 python3 $spt_dir/add_phenotype.py \

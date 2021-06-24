@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#SBATCH -J indel_germline_quantitative
+#SBATCH -J sv_germline_quantitative
 #SBATCH -p small
 #SBATCH --mail-user=mr.van@sjtu.edu.cn
 #SBATCH --mail-type=ALL
@@ -10,8 +10,8 @@
 
 root="/lustre/home/acct-clswcc/clswcc-fsy/gastricCancer/panGenome"
 spt_dir=$root/script/analyzeSNP
-vcf_dir=$root/data/indel
-res_dir=$root/result/indelGWAS/quantitative
+vcf_dir=$root/result/survivor/survivor_germline
+res_dir=$root/result/svGWAS/quantitative
 
 cd $res_dir || exit
 
