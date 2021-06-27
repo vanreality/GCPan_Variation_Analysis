@@ -29,4 +29,4 @@ python3 $spt_dir/add_phenotype.py \
 plink --bfile germline_qc -assoc --adjust --allow-extra-chr --out germline_assoc
 # Plink linear
 plink --bfile germline_qc --linear --allow-extra-chr --out germline_linear
-awk '!/NA/' germline_linear.assoc.linear > germline_linear_no_default.assoc.linear
+awk '!/NA/' germline_linear.assoc.linear > germline_linear_no_na.assoc.linear

@@ -29,4 +29,4 @@ python3 $spt_dir/add_phenotype.py \
 plink --bfile somatic_qc -assoc --adjust --allow-extra-chr --out somatic_assoc
 # Plink linear
 plink --bfile somatic_qc --linear --allow-extra-chr --out somatic_linear
-awk '!/NA/' somatic_linear.assoc.linear > somatic_linear_no_default.assoc.linear
+awk '!/NA/' somatic_linear.assoc.linear > somatic_linear_no_na.assoc.linear
