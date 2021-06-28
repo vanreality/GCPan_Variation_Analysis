@@ -12,6 +12,7 @@ root="/lustre/home/acct-clswcc/clswcc-fsy/gastricCancer/panGenome"
 spt_dir=$root/script/analyzeSNP
 vcf_dir=$root/result/survivor/survivor_germline
 res_dir=$root/result/svGWAS/quantitative
+sum_dir=$root/result/svGWAS/summary
 
 cd $res_dir || exit
 
@@ -29,4 +30,4 @@ python3 $spt_dir/add_phenotype.py \
 plink --bfile germline_manta_qc -assoc --allow-extra-chr --adjust --out germline_manta_assoc
 # Plink linear
 plink --bfile germline_manta_qc --linear --allow-extra-chr --out germline_manta_linear
-awk '!/NA/' germline_manta_linear.assoc.linear > germline_manta_linear_no_na.assoc.linear
+awk '!/NA/' germline_manta_linear.assoc.linear > ${sum_dir}/Diameter_manta

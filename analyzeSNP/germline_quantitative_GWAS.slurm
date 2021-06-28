@@ -12,6 +12,7 @@ root="/lustre/home/acct-clswcc/clswcc-fsy/gastricCancer/panGenome"
 spt_dir=$root/script/analyzeSNP
 vcf_dir=$root/data/snp
 res_dir=$root/result/snpGWAS/quantitative
+sum_dir=$root/result/snpGWAS/summary
 
 cd $res_dir || exit
 
@@ -29,4 +30,4 @@ python3 $spt_dir/add_phenotype.py \
 plink --bfile germline_qc -assoc --adjust --out germline_assoc
 # Plink linear
 plink --bfile germline_qc --linear --out germline_linear
-awk '!/NA/' germline_linear.assoc.linear > germline_linear_no_na.assoc.linear
+awk '!/NA/' germline_linear.assoc.linear > ${sum_dir}/Diameter

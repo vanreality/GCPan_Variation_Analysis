@@ -12,6 +12,7 @@ root="/lustre/home/acct-clswcc/clswcc-fsy/gastricCancer/panGenome"
 spt_dir=$root/script/analyzeSNP
 vcf_dir=$root/data/PAV
 res_dir=$root/result/pavGWAS/categorical
+sum_dir=$root/result/pavGWAS/summary
 
 cd $res_dir || exit
 
@@ -40,7 +41,8 @@ rm germline_tmp_*.f*
 rm germline_tmp_*.h*
 
 # Run GWAS for different phenotypes
-phenotypes=("Subtype" "Location" "Grade" "Lauren")
+#phenotypes=("Subtype" "Location" "Grade" "Lauren")
+phenotypes=("Location" "Grade" "Lauren")
 for p in ${phenotypes[*]} ; do
   # make phenotype directory
   mkdir $res_dir/$p
@@ -68,7 +70,7 @@ for p in ${phenotypes[*]} ; do
     plink --bfile germline_qc -assoc --adjust --allow-extra-chr --out germline_assoc
     # Plink logistic
     plink --bfile germline_qc --logistic --allow-extra-chr --out germline_logistic
-    awk '!/NA/' germline_logistic.assoc.logistic > germline_logistic_no_na.assoc.logistic
+    awk '!/NA/' germline_logistic.assoc.logistic > ${sum_dir}/${p}_${c}
   done
 done
 

@@ -12,11 +12,12 @@ root="/lustre/home/acct-clswcc/clswcc-fsy/gastricCancer/panGenome"
 spt_dir=$root/script/analyzeSNP
 vcf_dir=$root/data/snp
 res_dir=$root/result/snpGWAS/binary
+sum_dir=$root/result/snpGWAS/summary
 
 cd $res_dir || exit
 
 control=("hb" "hs")
-for c in ${control[*]} ; do
+for c in ${control[*]}; do
   # Convert vcf file to plink bed/bim/fam files
   plink --vcf $vcf_dir/germline_${c}.vcf --out germline_${c}_binary --double-id
 
@@ -46,7 +47,7 @@ for c in ${control[*]} ; do
   plink --bfile germline_${c}_binary_qc -assoc --adjust --out germline_${c}_binary_assoc
   # Plink logistic
   plink --bfile germline_${c}_binary_qc --logistic --out germline_${c}_binary_logistic
-  awk '!/NA/' germline_${c}_binary_logistic.assoc.logistic > germline_${c}_binary_logistic_no_na.assoc.logistic
+  awk '!/NA/' germline_${c}_binary_logistic.assoc.logistic > ${sum_dir}/${c}
 
   # Delete temporary files
   rm germline_${c}_tmp_*.b*
@@ -56,7 +57,7 @@ done
 
 # GWAS for binary traits
 phenotype=("EBV" "HP")
-for p in ${phenotype[*]} ; do
+for p in ${phenotype[*]}; do
   mkdir $res_dir/$p
   cd $res_dir/$p || exit
 
@@ -76,5 +77,5 @@ for p in ${phenotype[*]} ; do
 
   plink --bfile germline_${p}_qc -assoc --adjust --out germline_${p}_assoc
   plink --bfile germline_${p}_qc --logistic --out germline_${p}_logistic
-  awk '!/NA/' germline_${p}_logistic.assoc.logistic > germline_${p}_logistic_no_na.assoc.logistic
+  awk '!/NA/' germline_${p}_logistic.assoc.logistic > ${sum_dir}/${p}
 done

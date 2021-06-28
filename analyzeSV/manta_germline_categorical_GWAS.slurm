@@ -12,6 +12,7 @@ root="/lustre/home/acct-clswcc/clswcc-fsy/gastricCancer/panGenome"
 spt_dir=$root/script/analyzeSNP
 vcf_dir=$root/result/manta/survivor_germline
 res_dir=$root/result/svGWAS/categorical
+sum_dir=$root/result/svGWAS/summary
 
 cd $res_dir || exit
 
@@ -68,7 +69,6 @@ for p in ${phenotypes[*]} ; do
     plink --bfile germline_manta_qc -assoc --allow-extra-chr --adjust --out germline_manta_assoc
     # Plink logistic
     plink --bfile germline_manta_qc --logistic --allow-extra-chr --out germline_manta_logistic
-    awk '!/NA/' germline_manta_logistic.assoc.logistic > germline_manta_logistic_no_na.assoc.logistic
-  done
+    awk '!/NA/' germline_manta_logistic.assoc.logistic > ${sum_dir}/${p}_${c}_manta
 done
 
