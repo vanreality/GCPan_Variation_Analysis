@@ -19,7 +19,7 @@ cd $res_dir || exit
 control=("hb" "hs")
 for c in ${control[*]}; do
   # Convert vcf file to plink bed/bim/fam files
-  plink --vcf $vcf_dir/germline_${c}.vcf --out germline_${c}_binary --double-id
+  plink --vcf $vcf_dir/germline_${c}_filtered.vcf --out germline_${c}_binary --double-id
 
   # Add phenotype info
   python3 $spt_dir/add_phenotype.py \
@@ -46,7 +46,7 @@ for c in ${control[*]}; do
   # Plink assoc
   plink --bfile germline_${c}_binary_qc -assoc --adjust --out germline_${c}_binary_assoc
   # Plink logistic
-  plink --bfile germline_${c}_binary_qc --logistic --out germline_${c}_binary_logistic
+  plink --bfile germline_${c}_binary_qc --logistic --adjust --out germline_${c}_binary_logistic
   awk '!/NA/' germline_${c}_binary_logistic.assoc.logistic > ${sum_dir}/${c}
 
   # Delete temporary files

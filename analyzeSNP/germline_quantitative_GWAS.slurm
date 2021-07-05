@@ -29,5 +29,5 @@ python3 $spt_dir/add_phenotype.py \
 # Plink assoc
 plink --bfile germline_qc -assoc --adjust --out germline_assoc
 # Plink linear
-plink --bfile germline_qc --linear --out germline_linear
+plink --bfile germline_qc --linear --adjust --out germline_linear
 awk '!/NA/' germline_linear.assoc.linear > ${sum_dir}/Diameter
