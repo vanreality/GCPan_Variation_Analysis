@@ -7,12 +7,13 @@
 #SBATCH -o %J.out
 #SBATCH -e %J.err
 #SBATCH -N 1
-#SBATCH --ntasks-per-node=16
+#SBATCH --ntasks-per-node=20
 
 # arm software
 module use /lustre/share/spack/modules/kunpeng920/linux-centos7-aarch64
 module load gatk/4.2.0.0-gcc-9.3.0-openblas
 module load bwa/0.7.17-gcc-9.3.0
+module load gcc
 samtools=/lustre/home/acct-clswcc/clswcc-xhz/armtools/samtools-1.12/src/bin/samtools
 
 # fastq, reference, known snp/indel
@@ -26,24 +27,24 @@ knownsites_dir="/lustre/home/acct-clswcc/clswcc-fsy/gastricCancer/panGenome/data
 echo -e "Job $SLURM_JOBID starts at $(date)." >>gatk.log
 start=$(date +%s)
 bwa mem -M -R "@RG\tID:$sample\tSM:$sample\tPL:illumina\tLB:bar\tPU:barcode" \
-	-t 16 $reference $fastq_file1 $fastq_file2 >$sample.sam 2>$sample.log
+  -t 20 $reference $fastq_file1 $fastq_file2 >$sample.sam 2>bwa.log
 end=$(date +%s)
-cost=$(( end - start ))
-echo -e "bwa kernel time $((cost/60))min $((cost%60))s.\n" >>gatk.log
+cost=$((end - start))
+echo -e "bwa kernel time $((cost / 60))min $((cost % 60))s.\n" >>gatk.log
 
 start=$(date +%s)
-$samtools view -@ 16 -bS $sample.sam > $sample.bam \
-   && rm $sample.sam
+$samtools view -@ 20 -bS $sample.sam >$sample.bam &&
+  rm $sample.sam
 end=$(date +%s)
-cost=$(( end - start ))
-echo -e "sam2bam kernel time $((cost/60))min $((cost%60))s.\n" >>gatk.log
+cost=$((end - start))
+echo -e "sam2bam kernel time $((cost / 60))min $((cost % 60))s.\n" >>gatk.log
 
 start=$(date +%s)
-$samtools sort -@ 16 -m 32G -o $sample.sorted.bam -O bam -T sorted $sample.bam \
-   && rm $sample.bam
+$samtools sort -@ 20 -m 2G -o $sample.sorted.bam -O bam -T sorted $sample.bam &&
+  rm $sample.bam
 end=$(date +%s)
-cost=$(( end - start ))
-echo -e "sortbam kernel time $((cost/60))min $((cost%60))s.\n" >>gatk.log
+cost=$((end - start))
+echo -e "sortbam kernel time $((cost / 60))min $((cost % 60))s.\n" >>gatk.log
 
 #step 2. Mark PCR duplications by gatk:
 start=$(date +%s)
@@ -52,15 +53,19 @@ gatk MarkDuplicates \
 	-O $sample.dedup.bam \
 	-M metrics.txt \
    && rm $sample.sorted.bam
+#$samtools fixmate -@ 20 -m 2G $sample.sorted.bam $sample.fixmate.bam \
+#  && rm $sample.sorted.bam
+#$samtools markdup -s -@ 20 $sample.fixmate.bam $sample.dedup.bam \
+#  && rm $sample.fixmate.bam
 end=$(date +%s)
-cost=$(( end - start ))
-echo -e "MarkDuplicates kernel time $((cost/60))min $((cost%60))s.\n" >>gatk.log
+cost=$((end - start))
+echo -e "MarkDuplicates kernel time $((cost / 60))min $((cost % 60))s.\n" >>gatk.log
 
 start=$(date +%s)
-$samtools index -@ 16 $sample.dedup.bam
+$samtools index -@ 20 $sample.dedup.bam
 end=$(date +%s)
-cost=$(( end - start ))
-echo -e "index kernel time $((cost/60))min $((cost%60))s.\n" >>gatk.log
+cost=$((end - start))
+echo -e "index kernel time $((cost / 60))min $((cost % 60))s.\n" >>gatk.log
 
 #step 3. Base quality score recalibration by gatk:
 start=$(date +%s)
@@ -80,3 +85,8 @@ gatk ApplyBQSR \
 end=$(date +%s)
 cost=$(( end - start ))
 echo -e "BQSR kernel time $((cost/60))min $((cost%60))s.\n" >>gatk.log
+
+if [[ -f $sample.recal.bam ]]; then
+  rm $sample.sorted.bam
+  rm $sample.dedup.ba*
+fi
